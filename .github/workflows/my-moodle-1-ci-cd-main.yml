@@ -1,0 +1,32 @@
+name: Moodle CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: mbstring, intl, zip, xmlrpc, soap, gd, mysqli
+
+      - name: Install dependencies
+        run: |
+          composer install
+
+      # Ajoutez ici d'autres étapes pour exécuter des tests unitaires ou d'acceptation, si nécessaire.
+
+      - name: Deploy to server
+        run: |
+          rsync -av --exclude '.git' --exclude 'config.php' . root@khaledbahloul.org:/var/www/html/mymoodles/moodle
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
