@@ -1,32 +1,19 @@
-name: Moodle CI/CD
 
 on:
   push:
     branches:
       - main
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '7.4'
-          extensions: mbstring, intl, zip, xmlrpc, soap, gd, mysqli
-
-      - name: Install dependencies
-        run: |
-          composer install
-
-      # Ajoutez ici d'autres étapes pour exécuter des tests unitaires ou d'acceptation, si nécessaire.
-
-      - name: Deploy to server
-        run: |
-          rsync -av --exclude '.git' --exclude 'config.php' . root@khaledbahloul.org:/var/www/html/mymoodles/moodle
-        env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.MOODLE_SSH_PRIVATE_KEY }}
+    - name: Deploy Moodle
+      run: |
+        rsync -avz --exclude '.git*' --exclude 'config.php' --exclude 'moodledata' . root@khaledbahloul.org:/var/www/html/mymoodles/moodle
+        ssh root@khaledbahloul.org 'php /var/www/html/mymoodles/moodle/admin/cli/upgrade.php --non-interactive'
