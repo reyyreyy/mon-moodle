@@ -16,4 +16,4 @@ jobs:
     - name: Deploy Moodle
       run: |
         rsync -avz --exclude '.git*' --exclude 'config.php' --exclude 'moodledata' . root@khaledbahloul.org:/var/www/html/mymoodles/moodle
-        ssh root@khaledbahloul.org 'php /var/www/html/mymoodles/moodle/admin/cli/upgrade.php --non-interactive'
+        ssh khaled@khaledbahloul.org 'php /var/www/html/mymoodles/moodle/admin/cli/upgrade.php --non-interactive'
